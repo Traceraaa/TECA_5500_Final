@@ -9,6 +9,8 @@ from Utils import ui_helper
 
 from Functions.arm_rigging import ArmRigging
 from Functions.piston_rigging import PistonRigging
+from Functions.chain_rigging import ChainRigging
+from Functions.tread_rigging import TreadRigging
 from Functions import constraint_func
 
 ui_helper_tool = ui_helper
@@ -52,13 +54,13 @@ class View(object):
 
         # Tabs for tread
         child2 = cmds.rowColumnLayout(numberOfColumns=1)
-        # Tread_Tab_UI = Tread.build_ui(self)
+        Tread_Tab_UI = TreadRigging.build_ui(self)
         cmds.setParent(child2)
         cmds.setParent(tabs)
 
         # Tabs for chains
         child3 = cmds.rowColumnLayout(numberOfColumns=1)
-        # Tread_Tab_UI = Chain.build_ui(self)
+        Tread_Tab_UI = ChainRigging.build_ui(self)
         cmds.setParent(child3)
         cmds.setParent(tabs)
 
