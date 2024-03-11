@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 import sys
 import importlib
-
+from
 sys.path.append("C:/Users/weiwe/Documents/maya/2024/scripts/TECA_5500_Final")
 
 from Functions import arm_rig_func
