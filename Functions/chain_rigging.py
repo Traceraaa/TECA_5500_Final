@@ -6,9 +6,9 @@ from Utils import ui_helper
 global frame_layout_curve, frame_layout_controller, frame_layout_chain
 global slider_int_span_count, slider_float_smoothness, slider_int_redo_controller
 global btn_radio_curve_options, cb_use_smooth, btn_next_to_make_controllers, btn_make_controller, btn_to_final_step
-global btn_finalize, btn_make_chain, cb_make_proxy
+global btn_finalize, btn_make_chain, cb_make_proxy, btn_update
 
-global curve_type_picked, is_first_time, selected_curve
+global curve_type_picked, is_first_time, selected_curve, chain_count
 
 
 class ChainRigging(object):
@@ -58,6 +58,7 @@ class ChainRigging(object):
         cmds.rowLayout(numberOfColumns=2)
         btn_make_controller = cmds.button(l="CTRL maker", c="_make_controller()", en=False)
         btn_to_final_step = cmds.button(l="Next", c="_make_chain_section()", en=False)
+        btn_update = cmds.button(l="Update Chain", c="_update_chain()", en=False)
         cmds.setParent(ui_controller_layout)
         cmds.separator(w=700)
         cmds.setParent(main_layout)
@@ -67,8 +68,7 @@ class ChainRigging(object):
         ui_chain_layout = cmds.columnLayout()
         cmds.text("now if you are done, select your desired object and click next")
         cmds.rowLayout(numberOfColumns=3)
-        btn_finalize = cmds.button(l="Make Chain", c="_final_step()", en=False)
-        btn_make_chain = cmds.button(l="MakeChain Only", c="_make_chain()", en=False)
+        btn_make_chain = cmds.button(l="MakeChain", c="_make_chain()", en=False)
         cb_make_proxy = cmds.checkBox(l="Use Proxy Geo", cc="_make_proxy()", en=False)
         cmds.setParent(ui_chain_layout)
         cmds.setParent(main_layout)
@@ -132,7 +132,7 @@ def _controller_redo():
     chain_rig_func.controller_redo(selected_curve, new_span)
 
 def _make_controller():
-    global selected_curve
+    global selected_curve, chain_count
     chain_rig_func.make_controller(selected_curve)
 
     # UI
@@ -143,13 +143,34 @@ def _make_controller():
     ui_helper.disable_btn(btn_make_chain)
 
 def _make_chain_section():
-    pass
+    global frame_layout_controller, frame_layout_chain
+    ui_helper.disable_frame_layout(frame_layout_controller)
+    ui_helper.enable_frame_layout(frame_layout_chain)
 
-def _final_step():
-    pass
+
+def _update_chain():
+
+    chain_rig_func.update_chain()
+    ui_helper.disable_btn(btn_to_final_step)
+    _controller_redo()
+
+    cmds.select(selected_curve)
+
+    _make_chain()
 
 def _make_chain():
-    pass
+    global chain_count, selected_curve
+    user_selected_mesh = cmds.ls(sl=True)
+    if user_selected_mesh:
+        chain_rig_func.make_chain(selected_curve, chain_count)
+        ui_helper.enable_btn(btn_update)
+        ui_helper.disable_btn(btn_make_chain)
+        ui_helper.enable_int_slider_group(slider_int_redo_controller)
+        ui_helper.disable_checkbox(cb_make_proxy)
+
+
+
+
 
 def _make_proxy():
-    pass
+    chain_rig_func.make_proxy()
