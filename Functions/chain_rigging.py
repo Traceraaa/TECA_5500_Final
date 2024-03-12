@@ -55,7 +55,7 @@ class ChainRigging(object):
         ui_controller_layout = cmds.columnLayout()
         cmds.text("now if you are done with the curve, use this button to create controllers")
         slider_int_redo_controller = cmds.intSliderGrp(min=3, max=100, v=3, cc="_controller_redo()", f=True, en=False)
-        cmds.rowLayout(numberOfColumns=2)
+        cmds.rowLayout(numberOfColumns=3)
         btn_make_controller = cmds.button(l="CTRL maker", c="_make_controller()", en=False)
         btn_to_final_step = cmds.button(l="Next", c="_make_chain_section()", en=False)
         btn_update = cmds.button(l="Update Chain", c="_update_chain()", en=False)
