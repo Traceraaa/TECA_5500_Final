@@ -121,16 +121,24 @@ def _update_smoothness():
 
 
 def expand_controller_section():
-    chain_rig_func.
+    ui_helper.disable_frame_layout(frame_layout_curve)
+    ui_helper.enable_frame_layout(frame_layout_controller)
+
+
 def CTRLRedo():
     chain_rig_func.
+
 def CMaker():
     chain_rig_func.
+
 def make_chain_section():
     chain_rig_func.
+
 def FinalStep():
     chain_rig_func.
+
 def MakeChain():
     chain_rig_func.
+
 def make_proxy_geo():
     chain_rig_func.
