@@ -33,4 +33,36 @@ def update_smoothness(curve, new_smoothness):
     cmds.select(curve)
     isFirstTime = False
 
+def controller_redo(selected_curve, new_span):
+    global selected_curve_name
+
+    try:
+        cmds.delete("AllLocators")
+    except:
+        pass
+
+    cmds.select(selected_curve_name)
+    selected_curve = cmds.ls(sl=True)
+
+    cmds.rebuildCurve(selected_curve, rpo=True, kep=True, rt=0, s=new_span)
+    cmds.select(selected_curve)
+    make_controller()
+
+def make_controller(selected_curve):
+    selected_curve = cmds.ls(sl=True)
+    EPlist = cmds.ls(selected_curve[0] + ".ep[*]", fl=True)
+    chain_count = len(EPlist)
+    locList = []
+    # now with having those two lists we can create locators and dump them on each point in order
+    for ep in EPlist:
+        cmds.select(ep, r=True)
+        cmds.pointCurveConstraint()
+        cmds.CenterPivot()
+        locList.append(cmds.rename("EPCTRL1"))
+    cmds.select(locList)
+    cmds.group(n="AllLocators")
+    cmds.select(selected_curve)
+    cmds.select(cl=True)
+
+
 

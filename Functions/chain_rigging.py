@@ -54,10 +54,10 @@ class ChainRigging(object):
         frame_layout_controller = cmds.frameLayout(l="Make Controllers", w=700, cll=True, cl=True)
         ui_controller_layout = cmds.columnLayout()
         cmds.text("now if you are done with the curve, use this button to create controllers")
-        slider_int_redo_controller = cmds.intSliderGrp(min=3, max=100, v=3, cc="CTRLRedo()", f=True, en=False)
+        slider_int_redo_controller = cmds.intSliderGrp(min=3, max=100, v=3, cc="_controller_redo()", f=True, en=False)
         cmds.rowLayout(numberOfColumns=2)
-        btn_make_controller = cmds.button(l="CTRL maker", c="CMaker()", en=False)
-        btn_to_final_step = cmds.button(l="Next", c="make_chain_section()", en=False)
+        btn_make_controller = cmds.button(l="CTRL maker", c="_make_controller()", en=False)
+        btn_to_final_step = cmds.button(l="Next", c="_make_chain_section()", en=False)
         cmds.setParent(ui_controller_layout)
         cmds.separator(w=700)
         cmds.setParent(main_layout)
@@ -67,9 +67,9 @@ class ChainRigging(object):
         ui_chain_layout = cmds.columnLayout()
         cmds.text("now if you are done, select your desired object and click next")
         cmds.rowLayout(numberOfColumns=3)
-        btn_finalize = cmds.button(l="Make Chain", c="FinalStep()", en=False)
-        btn_make_chain = cmds.button(l="MakeChain Only", c="MakeChain()", en=False)
-        cb_make_proxy = cmds.checkBox(l="Use Proxy Geo", cc="make_proxy_geo()", en=False)
+        btn_finalize = cmds.button(l="Make Chain", c="_final_step()", en=False)
+        btn_make_chain = cmds.button(l="MakeChain Only", c="_make_chain()", en=False)
+        cb_make_proxy = cmds.checkBox(l="Use Proxy Geo", cc="_make_proxy()", en=False)
         cmds.setParent(ui_chain_layout)
         cmds.setParent(main_layout)
 
@@ -121,24 +121,35 @@ def _update_smoothness():
 
 
 def expand_controller_section():
+    global frame_layout_curve, frame_layout_controller
     ui_helper.disable_frame_layout(frame_layout_curve)
     ui_helper.enable_frame_layout(frame_layout_controller)
 
 
-def CTRLRedo():
-    chain_rig_func.
+def _controller_redo():
+    global selected_curve, slider_int_redo_controller
+    new_span = cmds.intSliderGrp(slider_int_redo_controller, q=True, v=True)
+    chain_rig_func.controller_redo(selected_curve, new_span)
 
-def CMaker():
-    chain_rig_func.
+def _make_controller():
+    global selected_curve
+    chain_rig_func.make_controller(selected_curve)
 
-def make_chain_section():
-    chain_rig_func.
+    # UI
+    ui_helper.disable_float_slider_group(slider_float_smoothness)
+    ui_helper.disable_int_slider_group(slider_int_redo_controller)
+    ui_helper.enable_btn(btn_to_final_step)
+    ui_helper.enable_int_slider_group(slider_int_redo_controller)
+    ui_helper.disable_btn(btn_make_chain)
 
-def FinalStep():
-    chain_rig_func.
+def _make_chain_section():
+    pass
 
-def MakeChain():
-    chain_rig_func.
+def _final_step():
+    pass
 
-def make_proxy_geo():
-    chain_rig_func.
+def _make_chain():
+    pass
+
+def _make_proxy():
+    pass
