@@ -1,6 +1,7 @@
 import maya.cmds as cmds
 
 from Functions import tread_rig_func
+from Utils import ui_helper
 
 global frame_locator_layout, frame_curve_layout, frame_tread_layout
 global btn_make_locator, btn_make_curve, btn_radio_options, btn_make_tread, btn_update_tread, btn_finalize_thread, btn_reset

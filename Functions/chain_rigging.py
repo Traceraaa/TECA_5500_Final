@@ -1,10 +1,21 @@
 import maya.cmds as cmds
 
 from Functions import chain_rig_func
+from Utils import ui_helper
+
+global frame_layout_curve, frame_layout_controller, frame_layout_chain
+global slider_int_span_count, slider_float_smoothness, slider_int_redo_controller
+global btn_radio_curve_options, cb_use_smooth, btn_next_to_make_controllers, btn_make_controller, btn_to_final_step
+global btn_finalize, btn_make_chain, cb_make_proxy
+
+global curve_type_picked, is_first_time, selected_curve
+
 
 class ChainRigging(object):
     def __init__(self):
         super(ChainRigging, self).__init__()
+        global is_first_time
+        is_first_time = True
 
     def build_ui(self):
         main_layout = cmds.columnLayout(mar=5)
@@ -20,20 +31,20 @@ class ChainRigging(object):
         btn_radio_curve_options = cmds.radioButtonGrp(label='Type of Curve',
                                         labelArray4=['Linear-1', 'Quadratic-2', 'Cubic-3', 'Quintic-5'],
                                         numberOfRadioButtons=4,
-                                        cc1='curvetype()',
-                                        cc2='curvetype()',
-                                        cc3='curvetype()',
-                                        cc4='curvetype()',
+                                        cc1='_curve_type()',
+                                        cc2='_curve_type()',
+                                        cc3='_curve_type()',
+                                        cc4='_curve_type()',
                                         en=False)
 
         cmds.rowLayout(numberOfColumns=2)
-        slider_int_span_count = cmds.intSliderGrp(min=3, max=100, v=3, cc="SpanMod()", f=True, en=False)
-        cb_use_smooth = cmds.checkBox(l="Adjust Smoothness", cc="NextStep()", en=False)
+        slider_int_span_count = cmds.intSliderGrp(min=3, max=100, v=3, cc="_span_mod()", f=True, en=False)
+        cb_use_smooth = cmds.checkBox(l="Adjust Smoothness", cc="_adjust_smoothness()", en=False)
         cmds.setParent(ui_curve_layout)
         cmds.separator(w=700)
 
         cmds.text("now if you want to smooth it, use this slider to smooth")
-        slider_float_smoothness = cmds.floatSliderGrp(min=0, max=10, v=0, cc="SmoothChange()", f=True, en=False)
+        slider_float_smoothness = cmds.floatSliderGrp(min=0, max=10, v=0, cc="_update_smoothness()", f=True, en=False)
         btn_next_to_make_controllers = cmds.button(l="Next", c="expand_controller_section()", en=False)
 
         cmds.separator(w=700)
@@ -63,14 +74,52 @@ class ChainRigging(object):
         cmds.setParent(main_layout)
 
 
-def curvetype():
-    chain_rig_func.curvetype
-def SpanMod():
-    chain_rig_func.
-def NextStep():
-    chain_rig_func.
-def SmoothChange():
-    chain_rig_func.
+def _curve_type():
+    global btn_radio_curve_options, slider_int_span_count, slider_float_smoothness, cb_use_smooth, curve_type_picked
+    curve_type_picked = chain_rig_func.curve_type(btn_radio_curve_options)
+
+    # UI helper
+    ui_helper.enable_int_slider_group(slider_int_span_count)
+    ui_helper.disable_float_slider_group(slider_float_smoothness)
+    ui_helper.disable_checkbox(cb_use_smooth)
+
+def _span_mod():
+    global curve_type_picked, cb_use_smooth, is_first_time, btn_radio_curve_options, btn_next_to_make_controllers
+
+    # UI
+    if curve_type_picked == 4:
+        curve_type_picked = 5
+    if curve_type_picked == 1:
+        ui_helper.disable_checkbox(cb_use_smooth)
+    else:
+        ui_helper.enable_checkbox(cb_use_smooth)
+
+    if not is_first_time:
+        cmds.undo()
+
+    ui_helper.disable_radio_button(btn_radio_curve_options)
+    ui_helper.enable_btn(btn_next_to_make_controllers)
+
+    span_value = cmds.intSliderGrp(slider_int_span_count, q=True, v=True)
+    selected_curve = chain_rig_func.span_mod(span_value)
+    is_first_time = False
+
+
+
+def _toggle_smoothness_slider():
+    ui_helper.disable_int_slider_group(slider_int_span_count)
+    ui_helper.enable_float_slider_group(slider_float_smoothness)
+
+
+def _update_smoothness():
+    global is_first_time, btn_next_to_make_controllers, slider_float_smoothness, selected_curve
+    new_smoothness_value = cmds.floatSliderGrp(slider_float_smoothness, q=True, v=True)
+    chain_rig_func.update_smoothness(selected_curve, new_smoothness_value)
+
+    ui_helper.enable_btn(btn_next_to_make_controllers)
+
+
+
 def expand_controller_section():
     chain_rig_func.
 def CTRLRedo():
