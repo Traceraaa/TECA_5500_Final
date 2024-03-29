@@ -1,7 +1,10 @@
 import maya.cmds as cmds
+import importlib
 
 from Functions import arm_rig_func
+importlib.reload(arm_rig_func)
 from Utils import ui_helper
+importlib.reload(ui_helper)
 
 
 global btn_make_locater
@@ -24,7 +27,7 @@ global ik_handle
 
 class ArmRigging(object):
     def __init__(self):
-        super(ArmRigging, self).__init__()
+        # super(ArmRigging, self).__init__()
         global btn_make_locater
         global btn_create_rig
         global btn_create_ik_handle
@@ -52,7 +55,7 @@ class ArmRigging(object):
         cmds.text(l="Please input how many pieces the arm has.")
         slider_total_pieces = cmds.intSliderGrp(l="Total Pieces: ", min=2, v=3, field=True)
         cmds.separator(h=15)
-        btn_make_locater = cmds.button(l="Initialize", w=window_width / 4, c="_make_locator()")
+        btn_make_locater = cmds.button(l="Initialize", w=window_width / 4, c="arm_rigging._make_locator()")
         cmds.setParent(frame_initialize)
         cmds.setParent(self.main_layout)
         cmds.separator(h=15)
@@ -67,7 +70,7 @@ class ArmRigging(object):
         cmds.menuItem(l="FK")
         cmds.menuItem(l="IK")
         cmds.separator(h=15)
-        btn_create_rig = cmds.button(l="Create Rig", w=window_width / 4, c="_create_rig()")
+        btn_create_rig = cmds.button(l="Create Rig", w=window_width / 4, c="arm_rigging._create_rig()")
 
 
         cmds.setParent(self.main_layout)
@@ -79,17 +82,20 @@ class ArmRigging(object):
         cmds.text(
             l="Please select start and end joints that you want an IK Handle for, then click \"Create IK\" button.")
         cmds.separator(h=15)
-        cmds.button(l="Create IK Handle", w=window_width / 4, c="_make_ik_handle()")
+        cmds.button(l="Create IK Handle", w=window_width / 4, c="arm_rigging._make_ik_handle()")
 
         cmds.setParent(self.main_layout)
 
         cmds.separator(h=25)
-        cmds.text(l="Please select all arm peices and then click \"Finalize\" button.")
+        cmds.text(l="Please select all arm pieces and then click \"Finalize\" button.")
         cmds.rowLayout(nc=2)
-        btn_finalize = cmds.button(l="Finalize", w=window_width / 4, c="_finalize()", en=False)
-        btn_reset = cmds.button(l="Reset", w=window_width / 4, c="_reset()", en=False)
+        btn_finalize = cmds.button(l="Finalize", w=window_width / 4, c="arm_rigging._finalize()", en=False)
+        btn_reset = cmds.button(l="Reset", w=window_width / 4, c="arm_rigging._reset()", en=False)
         cmds.setParent(self.main_layout)
 
+
+
+# Start of Arm Rigging Functions
 def _create_rig():
     global joint_list, locator_list
 
@@ -108,33 +114,44 @@ def _create_rig():
 
 
 def _make_locator():
+
     global slider_total_pieces, locator_list
 
+    # User Input Information
     number_of_locator = ui_helper.get_value_int_slider(slider_total_pieces)
     locator_list = arm_rig_func.make_locator(number_of_locator)
     print("Locator List created : {}".format(locator_list))
 
+    # UI Response
     ui_helper.disable_frame_layout(frame_initialize)
     ui_helper.enable_frame_layout(frame_create_rig)
     ui_helper.enable_btn(btn_reset)
+    # UI Response End
+
 
 def _make_ik_handle():
     global joint_list, locator_list, ik_handle
+
     ik_handle = arm_rig_func.create_ik_handle()
 
+    # UI Response
     ui_helper.disable_frame_layout(frame_IK_creater)
     ui_helper.enable_btn(btn_finalize)
     ui_helper.enable_btn(btn_reset)
+    # UI Response End
 
 def _reset():
     global locator_list, joint_list, ctrl_list
+
     arm_rig_func.reset(locator_list, joint_list, ctrl_list)
 
+    # UI Response
     ui_helper.disable_frame_layout(frame_IK_creater)
     ui_helper.disable_frame_layout(frame_create_rig)
     ui_helper.enable_frame_layout(frame_initialize)
     ui_helper.disable_btn(btn_reset)
     ui_helper.disable_btn(btn_finalize)
+    # UI Response End
 
 def _finalize():
     global locator_list, joint_list, option_rig_type, ctrl_list, ik_handle
@@ -156,12 +173,14 @@ def _finalize():
         ctrl_list = []
         arm_rig_func.reset(locator_list, joint_list, ctrl_list)
 
+    # UI Response
     ui_helper.disable_frame_layout(frame_IK_creater)
     ui_helper.disable_frame_layout(frame_create_rig)
     ui_helper.enable_frame_layout(frame_initialize)
     ui_helper.disable_btn(btn_reset)
     ui_helper.disable_btn(btn_finalize)
+    # UI Response End
 
 
-
+# End of Arm Rigging Functions
 
